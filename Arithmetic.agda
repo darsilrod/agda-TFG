@@ -61,134 +61,126 @@ module Peano where
 
 -- Propiedades de orden
 
-data Bool : 𝓤₀ ̇   where
-    true : Bool 
-    false : Bool
 
+_≤_ _≥_ : ℕ → ℕ → 𝓤₀ ̇
+0      ≤ y      = 𝟙
+succ x ≤ 0      = 𝟘
+succ x ≤ succ y = x ≤ y
 
-_≤_ : ℕ → ℕ → Bool
-n ≤ m = ?
+x ≥ y = y ≤ x
 
-    
--- _≤_ _≥_ : ℕ → ℕ → 𝓤₀ ̇
--- 0      ≤ y      = 𝟙
--- succ x ≤ 0      = 𝟘
--- succ x ≤ succ y = x ≤ y
+infix 10 _≤_
+infix 10 _≥_
 
--- x ≥ y = y ≤ x
+one-is-gt-zero : ¬ (1 ≤ 0)
+one-is-gt-zero = !𝟘 𝟘
 
--- infix 10 _≤_
--- infix 10 _≥_
+succ-is-gt-num : (x : ℕ) → ¬ (succ x ≤ x)
+succ-is-gt-num zero = one-is-gt-zero
+succ-is-gt-num (succ x) = succ-is-gt-num x
 
--- one-is-gt-zero : ¬ (1 ≤ 0)
--- one-is-gt-zero = !𝟘 𝟘
+≤-injective : {x y : ℕ} → (z : ℕ) → x + z ≤ y + z → x ≤ y
+≤-injective {x} {y} zero ind = ind
+≤-injective {x} {y} (succ z) ind = ≤-injective z ind
 
--- succ-is-gt-num : (x : ℕ) → ¬ (succ x ≤ x)
--- succ-is-gt-num zero = one-is-gt-zero
--- succ-is-gt-num (succ x) = succ-is-gt-num x
+≤-reflexive : (x : ℕ) → x ≤ x
+≤-reflexive zero = *
+≤-reflexive (succ x) = ≤-reflexive x
 
--- ≤-injective : {x y : ℕ} → (z : ℕ) → x + z ≤ y + z → x ≤ y
--- ≤-injective {x} {y} zero ind = ind
--- ≤-injective {x} {y} (succ z) ind = ≤-injective z ind
+≤-transitive-aux : (x y z : ℕ) → x ≤ y → y ≤ z → x ≤ z
+≤-transitive-aux zero y z x≤y y≤z = *
+≤-transitive-aux (succ x) zero z x≤y y≤z = !𝟘 _ x≤y
+≤-transitive-aux (succ x) (succ y) zero x≤y y≤z = !𝟘 _ y≤z
+≤-transitive-aux (succ x) (succ y) (succ z) x≤y y≤z = ≤-transitive-aux x y z x≤y y≤z
 
--- ≤-reflexive : (x : ℕ) → x ≤ x
--- ≤-reflexive zero = *
--- ≤-reflexive (succ x) = ≤-reflexive x
+≤-transitive : {x y z : ℕ} → x ≤ y → y ≤ z → x ≤ z
+≤-transitive {x} {y} {z} = ≤-transitive-aux x y z
 
--- ≤-transitive-aux : (x y z : ℕ) → x ≤ y → y ≤ z → x ≤ z
--- ≤-transitive-aux zero y z x≤y y≤z = *
--- ≤-transitive-aux (succ x) zero z x≤y y≤z = !𝟘 _ x≤y
--- ≤-transitive-aux (succ x) (succ y) zero x≤y y≤z = !𝟘 _ y≤z
--- ≤-transitive-aux (succ x) (succ y) (succ z) x≤y y≤z = ≤-transitive-aux x y z x≤y y≤z
+≤-succ : (x : ℕ) → x ≤ succ x
+≤-succ zero = *
+≤-succ (succ x) = ≤-succ x
 
--- ≤-transitive : {x y z : ℕ} → x ≤ y → y ≤ z → x ≤ z
--- ≤-transitive {x} {y} {z} = ≤-transitive-aux x y z
+≤-dec : (x y : ℕ) → decidable (x ≤ y) 
+≤-dec zero zero = inl *
+≤-dec zero (succ y) = inl *
+≤-dec (succ x) zero = inr id
+≤-dec (succ x) (succ y) = ≤-dec x y
 
--- ≤-succ : (x : ℕ) → x ≤ succ x
--- ≤-succ zero = *
--- ≤-succ (succ x) = ≤-succ x
+-- 
+_<_  : ℕ → ℕ → 𝓤₀ ̇ 
+0      < 0      = 𝟘
+0      < succ y = 𝟙
+succ x < 0      = 𝟘
+succ x < succ y = x < y
 
--- ≤-dec : (x y : ℕ) → decidable (x ≤ y) 
--- ≤-dec zero zero = inl *
--- ≤-dec zero (succ y) = inl *
--- ≤-dec (succ x) zero = inr id
--- ≤-dec (succ x) (succ y) = ≤-dec x y
+-- 
 
--- -- 
--- _<_  : ℕ → ℕ → 𝓤₀ ̇ 
--- 0      < 0      = 𝟘
--- 0      < succ y = 𝟙
--- succ x < 0      = 𝟘
--- succ x < succ y = x < y
+max : ℕ → ℕ → ℕ 
+max  0        y       = y
+max (succ x)  0       = succ x
+max (succ x) (succ y) = succ (max x y)
 
--- -- 
+_∸_ : ℕ → ℕ → ℕ 
+0      ∸ y      = 0
+succ x ∸ 0      = succ x
+succ x ∸ succ y = x ∸ y  
+infixl 20 _∸_
 
--- max : ℕ → ℕ → ℕ 
--- max  0        y       = y
--- max (succ x)  0       = succ x
--- max (succ x) (succ y) = succ (max x y)
+max-refl : (x y : ℕ) → max x y ＝ max y x 
+max-refl  0        0       = refl 0
+max-refl  0       (succ y) = refl (succ y)
+max-refl (succ x)  0       = refl (succ x)
+max-refl (succ x) (succ y) = ap succ (max-refl x y)
 
--- _∸_ : ℕ → ℕ → ℕ 
--- 0      ∸ y      = 0
--- succ x ∸ 0      = succ x
--- succ x ∸ succ y = x ∸ y  
--- infixl 20 _∸_
+max-assoc : (x y z : ℕ) → max (max x y) z ＝ max x (max y z)
+max-assoc 0         y        z       = refl _
+max-assoc (succ x)  0        z       = refl _
+max-assoc (succ x) (succ y)  0       = refl _
+max-assoc (succ x) (succ y) (succ z) = ap succ (max-assoc x y z)
 
--- max-refl : (x y : ℕ) → max x y ＝ max y x 
--- max-refl  0        0       = refl 0
--- max-refl  0       (succ y) = refl (succ y)
--- max-refl (succ x)  0       = refl (succ x)
--- max-refl (succ x) (succ y) = ap succ (max-refl x y)
+x≤max : (x y : ℕ) → x ≤ max x y 
+x≤max  0        y       = *
+x≤max (succ x)  0       = ≤-reflexive x
+x≤max (succ x) (succ y) = x≤max x y
 
--- max-assoc : (x y z : ℕ) → max (max x y) z ＝ max x (max y z)
--- max-assoc 0         y        z       = refl _
--- max-assoc (succ x)  0        z       = refl _
--- max-assoc (succ x) (succ y)  0       = refl _
--- max-assoc (succ x) (succ y) (succ z) = ap succ (max-assoc x y z)
+y≤max : (x y : ℕ) → y ≤ max x y 
+y≤max  x y = transport (y ≤_) (max-refl y x) (x≤max y x)
 
--- x≤max : (x y : ℕ) → x ≤ max x y 
--- x≤max  0        y       = *
--- x≤max (succ x)  0       = ≤-reflexive x
--- x≤max (succ x) (succ y) = x≤max x y
+z≤x-then-z≤max-x-y : (x y z : ℕ) → z ≤ x → z ≤ max x y 
+z≤x-then-z≤max-x-y  _ _               0       z≤x = *
+z≤x-then-z≤max-x-y  0       y        (succ z) z≤x = !𝟘 _ z≤x
+z≤x-then-z≤max-x-y (succ x) 0        (succ z) z≤x = z≤x
+z≤x-then-z≤max-x-y (succ x) (succ y) (succ z) z≤x = z≤x-then-z≤max-x-y x y z z≤x
 
--- y≤max : (x y : ℕ) → y ≤ max x y 
--- y≤max  x y = transport (y ≤_) (max-refl y x) (x≤max y x)
+z≤y-then-z≤max-x-y : (x y z : ℕ) → z ≤ y → z ≤ max x y 
+z≤y-then-z≤max-x-y x y z z≤y = transport (z ≤_) (max-refl y x) (z≤x-then-z≤max-x-y y x z z≤y)
 
--- z≤x-then-z≤max-x-y : (x y z : ℕ) → z ≤ x → z ≤ max x y 
--- z≤x-then-z≤max-x-y  _ _               0       z≤x = *
--- z≤x-then-z≤max-x-y  0       y        (succ z) z≤x = !𝟘 _ z≤x
--- z≤x-then-z≤max-x-y (succ x) 0        (succ z) z≤x = z≤x
--- z≤x-then-z≤max-x-y (succ x) (succ y) (succ z) z≤x = z≤x-then-z≤max-x-y x y z z≤x
+y≤z-then-max-x-y≤max-x-z : (x y z : ℕ) → y ≤ z → max x y ≤ max x z 
+y≤z-then-max-x-y≤max-x-z  x        0        0       y≤z = ≤-reflexive (max x 0)
+y≤z-then-max-x-y≤max-x-z  0        0       (succ y) y≤z = *
+y≤z-then-max-x-y≤max-x-z (succ x)  0       (succ y) y≤z = x≤max x y
+y≤z-then-max-x-y≤max-x-z  0       (succ y) (succ z) y≤z = y≤z
+y≤z-then-max-x-y≤max-x-z (succ x) (succ y) (succ z) y≤z = y≤z-then-max-x-y≤max-x-z x y z y≤z
 
--- z≤y-then-z≤max-x-y : (x y z : ℕ) → z ≤ y → z ≤ max x y 
--- z≤y-then-z≤max-x-y x y z z≤y = transport (z ≤_) (max-refl y x) (z≤x-then-z≤max-x-y y x z z≤y)
+≤-gets-diff : (y z : ℕ) → (y ≤ z) → Σ x ꞉ ℕ , x + y ＝ z 
+≤-gets-diff  0        z       y≤z = z , refl z
+≤-gets-diff (succ y)  0       y≤z = !𝟘 _ y≤z
+≤-gets-diff (succ y) (succ z) y≤z = pr₁ r,q , ap succ (pr₂ r,q)
+    where 
+    r,q = ≤-gets-diff y z y≤z
 
--- y≤z-then-max-x-y≤max-x-z : (x y z : ℕ) → y ≤ z → max x y ≤ max x z 
--- y≤z-then-max-x-y≤max-x-z  x        0        0       y≤z = ≤-reflexive (max x 0)
--- y≤z-then-max-x-y≤max-x-z  0        0       (succ y) y≤z = *
--- y≤z-then-max-x-y≤max-x-z (succ x)  0       (succ y) y≤z = x≤max x y
--- y≤z-then-max-x-y≤max-x-z  0       (succ y) (succ z) y≤z = y≤z
--- y≤z-then-max-x-y≤max-x-z (succ x) (succ y) (succ z) y≤z = y≤z-then-max-x-y≤max-x-z x y z y≤z
+diff-gets-max : (x y : ℕ) → x + (y ∸ x) ＝ max x y  
+diff-gets-max  0        0       = refl 0
+diff-gets-max  0       (succ y) = ap succ (Peano.zero+n y)
+diff-gets-max (succ x)  0       = refl _
+diff-gets-max (succ x) (succ y) = Peano.succ+y x (y ∸ x) ∙ (ap succ (diff-gets-max x y))
 
--- ≤-gets-diff : (y z : ℕ) → (y ≤ z) → Σ x ꞉ ℕ , x + y ＝ z 
--- ≤-gets-diff  0        z       y≤z = z , refl z
--- ≤-gets-diff (succ y)  0       y≤z = !𝟘 _ y≤z
--- ≤-gets-diff (succ y) (succ z) y≤z = pr₁ r,q , ap succ (pr₂ r,q)
---     where 
---     r,q = ≤-gets-diff y z y≤z
+max-x-zero-is-x : (x : ℕ) → max x 0 ＝ x
+max-x-zero-is-x  0       = refl 0
+max-x-zero-is-x (succ x) = refl (succ x)
 
--- diff-gets-max : (x y : ℕ) → x + (y ∸ x) ＝ max x y  
--- diff-gets-max  0        0       = refl 0
--- diff-gets-max  0       (succ y) = ap succ (Peano.zero+n y)
--- diff-gets-max (succ x)  0       = refl _
--- diff-gets-max (succ x) (succ y) = Peano.succ+y x (y ∸ x) ∙ (ap succ (diff-gets-max x y))
-
--- max-x-zero-is-x : (x : ℕ) → max x 0 ＝ x
--- max-x-zero-is-x  0       = refl 0
--- max-x-zero-is-x (succ x) = refl (succ x)
-
--- x∸≤-is-zero : (x y : ℕ) → (x ≤ y) → x ∸ y ＝ 0
--- x∸≤-is-zero  0        0       p = refl 0
--- x∸≤-is-zero  0       (succ y) p = refl 0
--- x∸≤-is-zero (succ x)  0       p = !𝟘 _ p
--- x∸≤-is-zero (succ x) (succ y) p = x∸≤-is-zero x y p
+x∸≤-is-zero : (x y : ℕ) → (x ≤ y) → x ∸ y ＝ 0
+x∸≤-is-zero  0        0       p = refl 0
+x∸≤-is-zero  0       (succ y) p = refl 0
+x∸≤-is-zero (succ x)  0       p = !𝟘 _ p
+x∸≤-is-zero (succ x) (succ y) p = x∸≤-is-zero x y p
