@@ -263,6 +263,18 @@ uncurry-addition-is-LOOP-computable = eg-LOOP , (funext (λ x → eg-LOOP-is-add
 -- finalizar, su valor sea 0 también. Estas variables, por tanto, servirán como
 -- variables auxiliares.
 
+-- En la referencia usada para formalizar esta idea, que puede encontrarse en
+-- https://ai.dmi.unibas.ch/_files/teaching/fs16/theo/slides/theory-d05.pdf, el
+-- concepto de programa que calcula una función limpiamente es distinto: un 
+-- programa es limpio si, tras su ejecución, todas las variables tienen el
+-- mismo valor que tomaban al principio, a excepción de X₀. Pero esto tiene
+-- problemas. Concretamente, supongamos que estamos escribiendo un programa
+-- que necesita usar una variable auxiliar X n. Como el programa tiene que ser
+-- limpio, después de la ejecución, tenemos que devolver el valor que había
+-- inicialmente en X n. Pero la única forma de hacer esto es usando otra 
+-- variable auxiliar, para la cual existiría el mismo problema, y así 
+-- comprobamos que esta noción de programa limpio no es la que buscamos..
+
 -- Calcula el mayor índice que aparece en una variable del programa. Convenimos
 -- que en el programa vacío vale 0.
 largest-index : LOOP-program → ℕ 
